@@ -5,18 +5,19 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel index.html",
-    "build": "parcel build index.html"
+    "build": "rm -rf dist && parcel build index.html --experimental-scope-hoisting"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "glslify": "^7.1.1",
-    "parcel-bundler": "^1.12.5",
-    "parcel-plugin-glsl": "^0.1.0",
     "regl": "^2.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.9"
+    "@babel/core": "^7.23.9",
+    "parcel-plugin-inline-source": "^1.0.0",
+    "parcel-bundler": "^1.12.5",
+    "parcel-plugin-glsl": "^0.1.0"
   }
 }
