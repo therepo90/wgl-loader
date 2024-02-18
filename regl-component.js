@@ -1,4 +1,6 @@
 import regl from "regl";
+//import regl from "https://npmcdn.com/regl@2.1.0/dist/regl.min.js"; // todo for prod use this in index.prod html
+// currently its 30kb minified. Could be reduced.
 
 export class ReglComponent extends HTMLElement {
     constructor() {
