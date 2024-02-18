@@ -38,8 +38,8 @@ export class ReglComponent extends HTMLElement {
             },
             uniforms: {
                 iResolution: ({viewportWidth, viewportHeight}) => [viewportWidth, viewportHeight],
-                mouse: ({}, props, batchId) => [this.mouse.x, this.mouse.y],
-                iTime: ({ time }) => (time - this.startTime) / 1000.0, // Time in seconds
+                iMouse: ({}, props, batchId) => [this.mouse.x, this.mouse.y],
+                iTime: ({ time }) => time//(time - this.startTime) / 1000.0, // Time in seconds
             },
             count: 6,
         });
