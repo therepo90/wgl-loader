@@ -5,11 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel + regl Example</title>
     <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
     </style>
 </head>
 <body>
-<script src="./index.js" inline="inline"></script>
+<script src="./index.js" ></script> <!-- /*inline="inline"*/ This has to be embedeed on the parent page, not everytime in the component-->
+    <regl-component></regl-component>
 </body>
 </html>
