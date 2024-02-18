@@ -1,0 +1,22 @@
+{
+  "name": "webgl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "glslify": "^7.1.1",
+    "parcel-bundler": "^1.12.5",
+    "parcel-plugin-glsl": "^0.1.0",
+    "regl": "^2.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.9"
+  }
+}
