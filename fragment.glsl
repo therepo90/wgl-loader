@@ -1,10 +1,7 @@
-//#ifdef GL_ES
+#ifdef GL_ES
 precision mediump float;
-//#endif
+#endif
 
-//varying vec2 vUV;
-//uniform sampler2D iChannel0;
-//uniform vec2 mouse;
 uniform vec2 iResolution;
 uniform float iTime; // seconds
 
