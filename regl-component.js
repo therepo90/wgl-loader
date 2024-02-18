@@ -7,13 +7,15 @@ export class ReglComponent extends HTMLElement {
         super();
         this.attachShadow({mode: 'open'}); //todo check mode
 
+        const width = "800px"; // @TODO parametrize
+        const height = "600px";
+
         this.shadowRoot.innerHTML = `
       <style>
-        :host { display: block; }
-        /*canvas { width: 800px; height: 600px; }*/
-        canvas {border: 1px solid black; margin: 0 auto;display: block;}
+        :host { display: block; width: 100%; height: 100%;  }
+        /*#regl-canvas { width: 100%; height: 100%; }*/
       </style>
-      <canvas id="regl-canvas" width="800px" height="600px"></canvas> 
+      <canvas id="regl-canvas" width="${width}" height="${height}"></canvas> 
     `; // @TODO widths etc
         this.mouse = { x: 0, y: 0 }; // Initial mouse position
         this.startTime = Date.now();

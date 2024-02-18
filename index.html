@@ -6,19 +6,23 @@
     <title>Parcel + regl Example</title>
     <style>
         body {
-            margin: 0;
-            overflow: hidden;
             background: #f1f1f1;
         }
 
-        canvas {
+        .canvas-container {
+            border: 1px solid black;
+            margin: 0 auto;
             display: block;
+            width: 800px;
+            height: 600px;
         }
     </style>
 </head>
 <body>
 
 <script src="./index.js" ></script> <!-- /*inline="inline"*/ This has to be embedeed on the parent page, not everytime in the component-->
+<div class="canvas-container">
     <regl-component></regl-component>
+</div>
 </body>
 </html>
