@@ -3,15 +3,16 @@ import regl from "regl";
 export class ReglComponent extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({mode: 'open'});
+        this.attachShadow({mode: 'open'}); //todo check mode
 
         this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; }
-        canvas { width: 100%; height: 100%; }
+        /*canvas { width: 800px; height: 600px; }*/
+        canvas {border: 1px solid black; margin: 0 auto;display: block;}
       </style>
-      <canvas id="regl-canvas"></canvas>
-    `;
+      <canvas id="regl-canvas" width="800px" height="600px"></canvas> 
+    `; // @TODO widths etc
         this.mouse = { x: 0, y: 0 }; // Initial mouse position
         this.startTime = Date.now();
         this.setupRegl();
