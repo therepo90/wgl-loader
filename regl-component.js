@@ -33,7 +33,7 @@ export class ReglComponent extends HTMLElement {
 
             },
             uniforms: {
-                resolution: ({viewportWidth, viewportHeight}) => [viewportWidth, viewportHeight],
+                iResolution: ({viewportWidth, viewportHeight}) => [viewportWidth, viewportHeight],
                 mouse: ({}, props, batchId) => [this.mouse.x, this.mouse.y],
             },
             count: 6,
