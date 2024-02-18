@@ -3,176 +3,135 @@ precision mediump float;
 #endif
 
 uniform vec2 iResolution;
-//uniform vec2 iMouse;
 uniform float iTime; // seconds
 
-
-
-/*
-This shader uses my Raymarcher Template shader (https://www.shadertoy.com/view/3styDs).
-
-I've replaced the sdCuboid() and sdCylinder() distance functions with the exact ones
-from Inigo Quilez's 3D distance functions article (https://iquilezles.org/articles/distfunctions)
-for nicer blending.
-*/
-
-// Default (background) color:
-vec3 backgroundColor = vec3(0.0, 0.0, 0.0);
-
-// Light variables:
-vec3 lightDirection = vec3(-0.58, 0.58, 0.58);
-vec3 lightColor = vec3(1.0, 1.0, 1.0);
-
-// Camera variables:
-vec3 cameraPosition = vec3(0.0, 0.0, 1000.0);
-vec3 cameraRight = vec3(1.0, 0.0, 0.0);
-vec3 cameraUp = vec3(0.0, 1.0, 0.0);
-vec3 cameraForward = vec3(0.0, 0.0, -1.0);
-float cameraFocalLength = 400.0;
-
-// Ray marching constants:
-const vec3 GRADIENT_STEP = vec3(0.001, 0.0, 0.0);
-const float MAX_TRACE_DISTANCE = 2000.0;
-const float MIN_HIT_DISTANCE = 0.001;
-const int MAX_STEPS = 500;
-
-// Raymarching structures:
-struct Ray {
-    vec3 origin;
-    vec3 direction;
-};
-
-struct Surface {
-    vec3 ambientColor;
-    vec3 diffuseColor;
-    vec3 specularColor;
-    float shininess;
-    float signedDistance;
-};
-
-// Signed Distance Functions (SDFs):
-float sdCuboid(in vec3 p, in float h, in float w, in float d) {
-    vec3 q = abs(p) - 0.5 * vec3(w, h, d);
-    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+float sdSphere( vec3 p, float s ) // s -radius
+{
+    return length(p)-s;
 }
 
-float sdCylinder(in vec3 p, in float h, in float r) {
-    vec2 d = abs(vec2(length(p.xz), p.y)) - vec2(r, 0.5 * h);
-    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0));
+float sdBox( vec3 p, vec3 b )
+{
+    vec3 q = abs(p) - b;
+    return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
-float sdSphere(in vec3 p, in float r) {
-    return length(p) - r;
+#define OBJ_CNT 3
+
+vec3 palette(float t) {
+    return .5+.5*cos(6.28318*(t+vec3(.3,.416,.557)));
 }
 
-// Constructive Solid Geometry (CSG) Operators:
-Surface SmoothUnion(in Surface surface1, in Surface surface2, in float smoothness) {
-    float interpolation = clamp(0.5 + 0.5 * (surface2.signedDistance - surface1.signedDistance) / smoothness, 0.0, 1.0);
-    return Surface(mix(surface2.ambientColor, surface1.ambientColor, interpolation),// - smoothness * interpolation * (1.0 - interpolation);
-    mix(surface2.diffuseColor, surface1.diffuseColor, interpolation),// - smoothness * interpolation * (1.0 - interpolation);
-    mix(surface2.specularColor, surface1.specularColor, interpolation),// - smoothness * interpolation * (1.0 - interpolation);
-    mix(surface2.shininess, surface1.shininess, interpolation),// - smoothness * interpolation * (1.0 - interpolation);
-    mix(surface2.signedDistance, surface1.signedDistance, interpolation) - smoothness * interpolation * (1.0 - interpolation));
+float smin(float a, float b, float k) {
+    float h = clamp(0.5 + 0.5*(a-b)/k, 0.0, 1.0);
+    return mix(a, b, h) - k*h*(1.0-h);
 }
 
-// Transformations:
-vec3 Translate(in vec3 p, in vec3 t) {
-    return p - t;
+
+
+mat2 rot2D(float a) {
+    return mat2(cos(a), -sin(a), sin(a), cos(a));
 }
 
-vec3 Rotate(in vec3 p, in vec3 r) {
-    vec3 rad = radians(-r);
-    vec3 cosRad = cos(rad);
-    vec3 sinRad = sin(rad);
+// Scene distance
+float map(vec3 p, out vec3 col1, out vec3 col2, out vec3 col3) {
 
-    mat3 xRotation = mat3(1.0,      0.0,       0.0,
-    0.0, cosRad.x, -sinRad.x,
-    0.0, sinRad.x,  cosRad.x);
 
-    mat3 yRotation = mat3( cosRad.y, 0.0, sinRad.y,
-    0.0, 1.0,      0.0,
-    -sinRad.y, 0.0, cosRad.y);
+    //vec3 sp1Pos = vec3(-3.0,.0,.0);
+    vec3 boxPos2 = vec3(-1.8,.0,.0);
+    vec3 q1 = p;
+    // q1.xy*=rot2D(iTime*2.);
+    float sp1 = sdBox(q1-boxPos2,vec3(.75));
 
-    mat3 zRotation = mat3(cosRad.z, -sinRad.z, 0.0,
-    sinRad.z,  cosRad.z, 0.0,
-    0.0,       0.0, 1.0);
 
-    return zRotation * yRotation * xRotation * p;
+    vec3 cube1Tint = vec3(1.0,.0,.0);
+    col1 = cube1Tint * max(0., 1.-sp1);
+
+    vec3 sp2Pos = vec3(sin(iTime*2.4)*2.1,.0,.0);
+    //sp2Pos.xy*=rot2D(iTime);
+    // vec3 q3 = q2.xy*=rot2D(-iTime*2.);
+    // We are moving the origin, not the sphere. THe pixel thinks as if it was placed somewhere else.
+    float sp2 = sdSphere(p-sp2Pos, 1.2);
+    vec3 spTint = vec3(0.0,1.0,.0);
+    col2 = spTint * max(0.,1.-sp2);
+
+
+
+    vec3 boxPos = vec3(1.8,0.0,0.);
+
+    vec3 q2 = p;
+
+    //q2.xy*=rot2D(-iTime*2.);
+
+    //q2.yz*=rot2D(-iTime*2.);
+    float box=sdBox(q2-boxPos,vec3(.75));
+
+    vec3 cube2Tint = vec3(0.0,0.0,1.0);
+    col3 = cube2Tint * max(0.,1.-box); // dont go into negative colors
+
+    //float[OBJ_CNT] objs;
+    //objs[0]=sp1;
+    //objs[1]=sp2;
+    //objs[2]=box;
+    float result = smin(smin(sp1, sp2, 0.5), box, 0.5);
+
+    return result;
 }
 
-// Scene mapping function:
-Surface mapScene(in vec3 p) {
-    vec4 metashapeInfo1 = vec4(vec2(sin(iTime * 0.75), cos(iTime * 1.0)) * 200.0, 0.0, 80.0);
-    vec4 metashapeInfo2 = vec4(vec2(cos(iTime * 1.0), cos(iTime * 1.25)) * 200.0, 0.0, 100.0);
-    vec4 metashapeInfo3 = vec4(vec2(sin(iTime * 1.25), cos(iTime * 0.5)) * 200.0, 0.0, 120.0);
 
-    Surface metashape1 = Surface(vec3(0.0, 0.0, 0.0),
-    vec3(1.0, 0.0, 0.0),
-    vec3(1.0, 1.0, 1.0), 8.0,
-    sdCuboid(Rotate(Translate(p, metashapeInfo1.xyz), vec3(0.0, 0.0, iTime * 40.0)), 2.0 * metashapeInfo1.w, 2.0 * metashapeInfo1.w, 2.0 * metashapeInfo1.w) - 10.0);
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    vec2 uv = (fragCoord * 2. - iResolution.xy) / iResolution.y;
 
-    Surface metashape2 = Surface(vec3(0.0, 0.0, 0.0),
-    vec3(0.0, 1.0, 0.0),
-    vec3(1.0, 1.0, 1.0), 64.0,
-    sdCylinder(Rotate(Translate(p, metashapeInfo2.xyz), vec3(0.0, 0.0, iTime * -20.0)), 2.0 * metashapeInfo2.w, metashapeInfo2.w) - 10.0);
+    // Initialization
 
-    Surface metashape3 = Surface(vec3(0.0, 0.0, 0.0),
-    vec3(0.0, 0.0, 1.0),
-    vec3(0.0, 0.0, 0.0), 0.0,
-    sdSphere(Translate(p, metashapeInfo3.xyz), metashapeInfo3.w));
+    float fff = 1.9;
+    vec3 ro = vec3(0, 0, -3);         // ray origin
+    vec3 rd = normalize(vec3(uv*fff, 1)); // ray direction
+    vec3 col = vec3(0);               // final pixel color
 
-    return SmoothUnion(metashape1, SmoothUnion(metashape2, metashape3, 70.0), 70.0);
-}
+    float t = 0.; // total distance travelled
 
-// Normal calculation function (using gradient):
-vec3 calculateNormal(in vec3 p) {
-    float gradientX = mapScene(p + GRADIENT_STEP.xyy).signedDistance - mapScene(p - GRADIENT_STEP.xyy).signedDistance;
-    float gradientY = mapScene(p + GRADIENT_STEP.yxy).signedDistance - mapScene(p - GRADIENT_STEP.yxy).signedDistance;
-    float gradientZ = mapScene(p + GRADIENT_STEP.yyx).signedDistance - mapScene(p - GRADIENT_STEP.yyx).signedDistance;
-    return normalize(vec3(gradientX, gradientY, gradientZ));
-}
+    // Raymarching
+    vec3 col1,col2,col3;
+    for (int i = 0; i < 80; i++) {
+        vec3 p = ro + rd * t;     // position along the ray
 
-// Surface shader (uses the Phong illumination model):
-vec3 shadeSurface(in Surface surface, in Ray ray, in vec3 normal) {
-    vec3 illuminationAmbient = surface.ambientColor * lightColor;
-    float lambertian = max(0.0, dot(normal, lightDirection));
-    vec3 illuminationDiffuse = lambertian * surface.diffuseColor * lightColor;
-    vec3 reflection = reflect(lightDirection, normal);
-    float specularAngle = max(0.0, dot(reflection, ray.direction));
-    vec3 illuminationSpecular = clamp(pow(specularAngle, surface.shininess), 0.0, 1.0) * surface.specularColor * lightColor;
-    return illuminationAmbient + illuminationDiffuse + illuminationSpecular;
-}
+        float d = map(p, col1, col2, col3);         // current distance to the scene
 
-// Raymarching loop:
-vec4 rayMarch(in Ray ray) {
-    float distanceTraveled = 0.0;
-    for (int iterations=0; iterations < MAX_STEPS; ++iterations) {
-        vec3 currentPosition = ray.origin + ray.direction * distanceTraveled;
-        Surface sceneSurface = mapScene(currentPosition);
-        if (abs(sceneSurface.signedDistance) < MIN_HIT_DISTANCE) {
-            vec3 normal = calculateNormal(currentPosition);
-            vec3 color = shadeSurface(sceneSurface, ray, normal);
-            return vec4(color, 1.0);
-        }
+        t += d;                   // "march" the ray
 
-        if (distanceTraveled > MAX_TRACE_DISTANCE) {
-            break;
-        }
-
-        distanceTraveled += sceneSurface.signedDistance;
+        if (d < .001) break;      // early stop if close enough
+        if (t > 100.) break;      // early stop if too far
     }
 
-    return vec4(backgroundColor, 1.0);
+    // Coloring
+    //col = vec3(t * .2);           // color based on distance
+    // t can be very big hence its white
+    //col=vec3(1.0);
+
+    //col+=col1*t;
+    //col=col1;
+    col+=(col1 + col2 + col3)*t*.3;
+
+    col+=vec3(0.85) * step(100.,t); // not hit - show bg
+
+    //col*=3.0;
+    //float zz = min(0.,t);
+    //col+=vec3(1.0)*step(0.,zz);
+    //col=vec3(1.-zz);
+    //col+=vec3(1.0)*(1.-zz);
+    //col*=3.0;
+    //col=min(
+    //col+=vec3(t * .2)*0.04;
+
+    //col /= palette(t);
+    // col = vec3(t * .2);
+    fragColor = vec4(col, 1);
 }
 
-// Pixel shader output function:
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    vec2 halfResolution = 0.5 * iResolution.xy;
-    vec2 xy = fragCoord - halfResolution;
-    vec3 rayOrigin = cameraPosition + cameraForward * cameraFocalLength;
-    vec3 rayDirection = normalize(rayOrigin - (cameraPosition - cameraRight * xy.x - cameraUp * xy.y));
-    fragColor = rayMarch(Ray(rayOrigin, rayDirection));
-}
+
+
+
 
 void main()
 {
