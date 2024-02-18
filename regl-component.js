@@ -13,6 +13,7 @@ export class ReglComponent extends HTMLElement {
       <canvas id="regl-canvas"></canvas>
     `;
         this.mouse = { x: 0, y: 0 }; // Initial mouse position
+        this.startTime = Date.now();
         this.setupRegl();
         this.setupMouseListeners();
     }
@@ -35,6 +36,7 @@ export class ReglComponent extends HTMLElement {
             uniforms: {
                 iResolution: ({viewportWidth, viewportHeight}) => [viewportWidth, viewportHeight],
                 mouse: ({}, props, batchId) => [this.mouse.x, this.mouse.y],
+                iTime: ({ time }) => (time - this.startTime) / 1000.0, // Time in seconds
             },
             count: 6,
         });

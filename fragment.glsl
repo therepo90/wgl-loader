@@ -6,7 +6,7 @@ precision mediump float;
 //uniform sampler2D iChannel0;
 //uniform vec2 mouse;
 uniform vec2 iResolution;
-//uniform float iTime; // seconds
+uniform float iTime; // seconds
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     vec2 uv = (fragCoord * 2. - iResolution.xy) / iResolution.y;
