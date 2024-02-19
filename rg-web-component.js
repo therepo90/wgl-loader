@@ -75,7 +75,7 @@ export class RgWebComponent extends HTMLElement {
         gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
         const resolutionUniformLocation = gl.getUniformLocation(program, 'iResolution');
-        //const mouseUniformLocation = gl.getUniformLocation(program, 'iMouse');
+        const mouseUniformLocation = gl.getUniformLocation(program, 'iMouse');
         const timeUniformLocation = gl.getUniformLocation(program, 'iTime');
 
         if (resolutionUniformLocation === null || timeUniformLocation === null) {
@@ -89,7 +89,7 @@ export class RgWebComponent extends HTMLElement {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
-            //gl.uniform2f(mouseUniformLocation, this.mouse.x, this.mouse.y);
+            gl.uniform2f(mouseUniformLocation, this.mouse.x, this.mouse.y);
             gl.uniform1f(timeUniformLocation, (Date.now() - this.startTime) / 1000.0);
 
             gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -133,9 +133,12 @@ export class RgWebComponent extends HTMLElement {
 
     setupMouseListeners() {
         const canvas = this.shadowRoot.getElementById('rg-wgl-loader-canvas');
+        const rect = canvas.getBoundingClientRect();
+
         canvas.addEventListener('mousemove', (event) => {
-            this.mouse.x = (event.clientX / canvas.width) * 2 - 1;
-            this.mouse.y = 1 - (event.clientY / canvas.height) * 2;
+            this.mouse.x = event.clientX - rect.left;//((event.clientX - rect.left) / rect.width) * 2 - 1;
+            this.mouse.y = rect.height-(event.clientY - rect.top);//-((event.clientY - rect.top) / rect.height) * 2 + 1;
+            console.log(this.mouse);
         });
     }
 }

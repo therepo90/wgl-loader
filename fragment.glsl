@@ -87,10 +87,18 @@ float smoothstep3(float edge0, float edge1, float edge2, float x) {
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     vec2 uv = (fragCoord * 2. - iResolution.xy) / iResolution.y;
 
-    uv.xy*=rot2D(iTime);
+    //uv.xy*=rot2D(iTime);
+
+    vec2 mouse = (iMouse.xy - 0.5 * iResolution.xy) / (0.5 * iResolution.y);
+    vec2 dir = normalize(uv - mouse);
+    float d = distance(mouse, uv);
+    float p = 0.1 * (1.0 / (d * d));
+   // if(length(mouse)<.98){
+        uv=+mix(uv, mouse, p);
+   // }
     // Initialization
 
-    float fff = 1.4;
+    float fff = 1.5;
     vec3 ro = vec3(0, 0, -3);         // ray origin
     vec3 rd = normalize(vec3(uv*fff, 1)); // ray direction
     vec3 col = vec3(0);               // final pixel color
@@ -121,7 +129,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
 
     vec3 bgTint = vec3(1.);
     vec3 bg = vec3(0.);
-    float circR = 1.8;
+    float circR = 1.6;
     float edge0 = 0.45;
     float edgeInner = 0.51;
     float edgeOuter = 0.53;
@@ -145,4 +153,5 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     //fragColor = vec4(col, 1.);
     //fragColor = vec4(vec3(perimeter), 1.);
     fragColor = vec4(col, alpha);
+    //fragColor= vec4(vec3(d),1.);
 }

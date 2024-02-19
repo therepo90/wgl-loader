@@ -5,6 +5,7 @@ precision mediump float;
 
 uniform vec2 iResolution;
 uniform float iTime; // seconds
+uniform vec2 iMouse;
 
 #include "fragment.glsl"
 
