@@ -105,7 +105,7 @@ float smoothstep3(float edge0, float edge1, float edge2, float x) {
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     vec2 uv = (fragCoord * 2. - iResolution.xy) / iResolution.y;
 
-    //uv.xy*=rot2D(iTime);
+    uv.xy*=rot2D(iTime);
 
     vec2 mouse = (iMouse.xy - 0.5 * iResolution.xy) / (0.5 * iResolution.y);
     vec2 dir = normalize(uv - mouse);
