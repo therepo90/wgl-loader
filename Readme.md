@@ -2,6 +2,8 @@
 
 This is a fancy webgl loader web component. Its only 9kb.
 
+![](https://github.com/therepo90/wgl-loader/blob/main/demo.gif)
+
 Be aware that your grandpa mobile browser probably won't see it. 
 
 # Usage
@@ -36,6 +38,3 @@ Its using raymarching and sdfs techniques and raw opengl.
 ### Customizing loader
 You can use your own loader shader - just copy-paste the shadertoy code to fragment.glsl
 
-Preview:
-
-![](https://github.com/therepo90/wgl-loader/blob/main/demo.gif)
