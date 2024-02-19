@@ -133,11 +133,12 @@ export class RgWebComponent extends HTMLElement {
 
     setupMouseListeners() {
         const canvas = this.shadowRoot.getElementById('rg-wgl-loader-canvas');
-        const rect = canvas.getBoundingClientRect();
 
         document.addEventListener('mousemove', (event) => {
-            this.mouse.x = event.clientX - rect.left;//((event.clientX - rect.left) / rect.width) * 2 - 1;
-            this.mouse.y = rect.height-(event.clientY - rect.top);//-((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            const rect = canvas.getBoundingClientRect();
+            this.mouse.x = event.clientX - rect.left;
+            this.mouse.y = rect.height-(event.clientY - rect.top);
             console.log(this.mouse);
         });
     }
