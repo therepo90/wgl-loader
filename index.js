@@ -1,4 +1,4 @@
-import {ReglComponent} from './regl-component';
+import {WebComponent} from './web-component';
 console.log('Init');//
-customElements.define('regl-component', ReglComponent);
+customElements.define('rg-wgl-loader', WebComponent);
 

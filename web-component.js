@@ -1,4 +1,4 @@
-export class ReglComponent extends HTMLElement {
+export class WebComponent extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -10,7 +10,7 @@ export class ReglComponent extends HTMLElement {
             <style>
                 :host { display: block; width: 100%; height: 100%; }
             </style>
-            <canvas id="regl-canvas" width="${width}" height="${height}"></canvas>
+            <canvas id="rg-wgl-loader-canvas" width="${width}" height="${height}"></canvas>
         `;
         this.mouse = { x: 0, y: 0 };
         this.startTime = Date.now();
@@ -19,7 +19,7 @@ export class ReglComponent extends HTMLElement {
     }
 
     setupWebGL() {
-        const canvas = this.shadowRoot.getElementById('regl-canvas');
+        const canvas = this.shadowRoot.getElementById('rg-wgl-loader-canvas');
         const gl = canvas.getContext('webgl');
 
         if (!gl) {
@@ -124,7 +124,7 @@ export class ReglComponent extends HTMLElement {
     }
 
     setupMouseListeners() {
-        const canvas = this.shadowRoot.getElementById('regl-canvas');
+        const canvas = this.shadowRoot.getElementById('rg-wgl-loader-canvas');
         canvas.addEventListener('mousemove', (event) => {
             this.mouse.x = (event.clientX / canvas.width) * 2 - 1;
             this.mouse.y = 1 - (event.clientY / canvas.height) * 2;
