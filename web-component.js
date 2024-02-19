@@ -3,14 +3,19 @@ export class WebComponent extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
 
-        const width = "800px";
-        const height = "600px";
 
+    }
+    connectedCallback() {
+        console.log('connected');
+
+        // calculate client width and height of this element
+        const parentWidth = this.getBoundingClientRect().width;
+        const parentHeight = this.getBoundingClientRect().height;
         this.shadowRoot.innerHTML = `
             <style>
                 :host { display: block; width: 100%; height: 100%; }
             </style>
-            <canvas id="rg-wgl-loader-canvas" width="${width}" height="${height}"></canvas>
+            <canvas id="rg-wgl-loader-canvas" width="${parentWidth}px" height="${parentHeight}px"></canvas>
         `;
         this.mouse = { x: 0, y: 0 };
         this.startTime = Date.now();

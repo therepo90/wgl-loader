@@ -9,20 +9,42 @@
             background: #f1f1f1;
         }
 
-        .canvas-container {
-            border: 1px solid black;
-            margin: 0 auto;
+        div.overlay-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader-container {
+            /*border: 1px solid black;*/
+            /*margin: 0 auto;*/
             display: block;
-            width: 800px;
-            height: 600px;
+            width: 90px;
+            height: 90px;
+            /*width: 400px;
+            height: 400px;*/
+        }
+        rg-wgl-loader {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
 
 <script src="./index.js" ></script> <!-- /*inline="inline"*/ This has to be embedeed on the parent page, not everytime in the component-->
-<div class="canvas-container">
-    <rg-wgl-loader></rg-wgl-loader>
+This is lorem ipsum page
+<div class="overlay-container">
+    <div class="loader-container">
+        <rg-wgl-loader></rg-wgl-loader>
+    </div>
 </div>
 </body>
 </html>

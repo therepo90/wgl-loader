@@ -80,7 +80,9 @@ float map(vec3 p, out vec3 col1, out vec3 col2, out vec3 col3) {
 
     return result;
 }
-
+float smoothstep3(float edge0, float edge1, float edge2, float x) {
+    return clamp((smoothstep(edge0, edge1, x) - smoothstep(edge1, edge2, x)), 0.0, 1.0);
+}
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     vec2 uv = (fragCoord * 2. - iResolution.xy) / iResolution.y;
@@ -117,29 +119,28 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     //col=col1;
     col+=(col1 + col2 + col3)*t*.3;
 
-    vec3 bgTint = vec3(0.85);
+    vec3 bgTint = vec3(1.);
     vec3 bg = vec3(0.);
     float circR = 1.8;
+    float edge0 = 0.44;
+    float edgeInner = 0.48;
+    float edgeOuter = 0.55;
+
     //uv+=sin(iTime)*0.1;
-    float bgVal = 1.-smoothstep(0.48,0.55,length(uv)/circR);
-    bgVal-=smoothstep(0.5,0.4,length(uv)/circR);
-    bg=bgVal*bgTint*abs(0.6+ sin(iTime)*sin(iTime)*1.3);
-    col+=bg;// * (step(100.,t)); // not hit - show bg
+    float bgVal = 1.-smoothstep(edgeInner,edgeOuter, length(uv)/circR);
+    float perimeter = smoothstep3(edge0, edgeInner, edgeOuter, length(uv)/circR);
+    //bgVal+=smoothstep(edgeInner,edgeOuter, length(uv)/circR) ;
+    bg=bgVal*bgTint * (step(100.,t));//*abs(0.6+ sin(iTime)*sin(iTime)*1.3);
+    //bg+=obwod*10.;
+    //col+=bg;// * (step(100.,t)); // not hit - show bg
+    col+=perimeter ;
 
-    col+=vec3(1.)* (step(100.,t))*step(0.48,length(uv)/circR);
-    //col = bg;
-    //col*=palette(iTime);
-    //col*=sin(iTime);
-    //col*=3.0;
-    //float zz = min(0.,t);
-    //col+=vec3(1.0)*step(0.,zz);
-    //col=vec3(1.-zz);
-    //col+=vec3(1.0)*(1.-zz);
-    //col*=3.0;
-    //col=min(
-    //col+=vec3(t * .2)*0.04;
-
-    //col /= palette(t);
-    // col = vec3(t * .2);
-    fragColor = vec4(col, 1);
+    float alpha = 1.;
+    alpha = (1.-smoothstep(edgeInner, edgeOuter, length(uv)/circR)); // transparent bg outside circle
+    //col += vec3(alpha) *.4;
+    //col = vec3(alpha);
+    //col = vec3(bgVal);
+    //fragColor = vec4(col, 1.);
+    //fragColor = vec4(vec3(perimeter), 1.);
+    fragColor = vec4(col, alpha);
 }
