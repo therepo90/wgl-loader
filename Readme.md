@@ -38,4 +38,4 @@ You can use your own loader shader - just copy-paste the shadertoy code to fragm
 
 Preview:
 
-![](https://github.com/therepo90/wgl-loader/blob/main/demo.mp4)
+![](https://github.com/therepo90/wgl-loader/blob/main/demo.gif)
