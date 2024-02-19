@@ -4,17 +4,20 @@ This is a fancy webgl loader web component. Its only 9kb.
 
 ![](https://github.com/therepo90/wgl-loader/blob/main/demo.gif)
 
-Be aware that your grandpa mobile browser probably won't see it. 
+# Demo:
+https://therepo90.github.io/wgl-loader/
+
+Be aware that your grandpa mobile browser probably won't see it.
 
 # Usage
 Include js
-```<script src="https://github.com/therepo90/wgl-loader/blob/main/rg-web-component.[hash].js" ></script>```
+```<script src="https://github.com/therepo90/wgl-loader/blob/main/rg-webz-component.[hash].js" ></script>```
 
 Or just download the file and
 
 ```<script src="rg-web-component.js" ></script>```
 
-Add 
+Add
 ```
 rg-wgl-loader {
             display: block;
@@ -31,7 +34,7 @@ and then add anywhere
 ## Example
 See index.html
 
-Its using the fragment shader code from https://www.shadertoy.com/view/tscBz8
+Its using the fragment shader code from https://www.shadertoy.com/view/XXSGRm
 
 Its using raymarching and sdfs techniques and raw opengl.
 
