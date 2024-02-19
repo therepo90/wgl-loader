@@ -1,64 +1,133 @@
-import regl from "regl";
-//import regl from "https://npmcdn.com/regl@2.1.0/dist/regl.min.js"; // todo for prod use this in index.prod html
-// currently its 30kb minified. Could be reduced.
-
 export class ReglComponent extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({mode: 'open'}); //todo check mode
+        this.attachShadow({ mode: 'open' });
 
-        const width = "800px"; // @TODO parametrize
+        const width = "800px";
         const height = "600px";
 
         this.shadowRoot.innerHTML = `
-      <style>
-        :host { display: block; width: 100%; height: 100%;  }
-        /*#regl-canvas { width: 100%; height: 100%; }*/
-      </style>
-      <canvas id="regl-canvas" width="${width}" height="${height}"></canvas> 
-    `; // @TODO widths etc
-        this.mouse = { x: 0, y: 0 }; // Initial mouse position
+            <style>
+                :host { display: block; width: 100%; height: 100%; }
+            </style>
+            <canvas id="regl-canvas" width="${width}" height="${height}"></canvas>
+        `;
+        this.mouse = { x: 0, y: 0 };
         this.startTime = Date.now();
-        this.setupRegl();
+        this.setupWebGL();
         this.setupMouseListeners();
     }
 
-    setupRegl() {
+    setupWebGL() {
         const canvas = this.shadowRoot.getElementById('regl-canvas');
-        const reglInstance = regl(canvas);
+        const gl = canvas.getContext('webgl');
+
+        if (!gl) {
+            console.error('Unable to initialize WebGL. Your browser may not support it.');
+            return;
+        }
 
         const vertexShaderSource = require('./vertex.glsl');
-
         const fragmentShaderSource = require('./fragment.glsl');
 
-        const drawRect = reglInstance({
-            frag: fragmentShaderSource,
-            vert: vertexShaderSource,
-            attributes: {
-                position: [-1, -1, -1, 1, 1, 1, -1, -1, 1, 1, 1, -1], // Full-screen rectangle
+        // Compile shaders
+        const vertexShader = this.compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = this.compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
-            },
-            uniforms: {
-                iResolution: ({viewportWidth, viewportHeight}) => [viewportWidth, viewportHeight],
-                iMouse: ({}, props, batchId) => [this.mouse.x, this.mouse.y],
-                iTime: ({ time }) => time//(time - this.startTime) / 1000.0, // Time in seconds
-            },
-            count: 6,
-        });
+        if (!vertexShader || !fragmentShader) {
+            console.error('Shader compilation failed.');
+            return;
+        }
 
-        reglInstance.frame(({time, drawingBufferWidth, drawingBufferHeight}) => {
-            reglInstance.clear({
-                color: [0, 0, 0, 1],
-            });
+// Link shaders into a program
+        const program = this.createProgram(gl, vertexShader, fragmentShader);
 
-            // Set the mouse coordinates as a prop for the shader
-            drawRect();
-        });
+        if (!program) {
+            console.error('Shader program linking failed.');
+            return;
+        }
+
+        // Create buffer and set vertices
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        const vertices = new Float32Array([-1, -1, -1, 1, 1, 1, -1, -1, 1, 1, 1, -1]);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+        // Use program and set attributes and uniforms
+        gl.useProgram(program);
+
+        const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
+        if (positionAttributeLocation === -1) {
+            console.error('Unable to get attribute location for a_position');
+            return;
+        }
+
+        gl.enableVertexAttribArray(positionAttributeLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+        const resolutionUniformLocation = gl.getUniformLocation(program, 'iResolution');
+        //const mouseUniformLocation = gl.getUniformLocation(program, 'iMouse');
+        const timeUniformLocation = gl.getUniformLocation(program, 'iTime');
+
+        if (resolutionUniformLocation === null || timeUniformLocation === null) {
+            console.error('Unable to get uniform location(s)');
+            return;
+        }
+
+        gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
+
+        const draw = () => {
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            //gl.uniform2f(mouseUniformLocation, this.mouse.x, this.mouse.y);
+            gl.uniform1f(timeUniformLocation, (Date.now() - this.startTime) / 1000.0);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+        };
+
+        const animate = () => {
+            draw();
+            requestAnimationFrame(animate);
+        };
+
+        animate();
     }
+
+    compileShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.error(`Error compiling shader: ${gl.getShaderInfoLog(shader)}`);
+            gl.deleteShader(shader);
+            return null;
+        }
+
+        return shader;
+    }
+
+    createProgram(gl, vertexShader, fragmentShader) {
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error(`Unable to initialize the shader program: ${gl.getProgramInfoLog(program)}`);
+            return null;
+        }
+
+        return program;
+    }
+
     setupMouseListeners() {
-        document.addEventListener('mousemove', (event) => {
-            this.mouse.x = event.clientX / window.innerWidth;
-            this.mouse.y = 1.0 - event.clientY / window.innerHeight;
+        const canvas = this.shadowRoot.getElementById('regl-canvas');
+        canvas.addEventListener('mousemove', (event) => {
+            this.mouse.x = (event.clientX / canvas.width) * 2 - 1;
+            this.mouse.y = 1 - (event.clientY / canvas.height) * 2;
         });
     }
 }

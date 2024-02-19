@@ -8,12 +8,12 @@
     "build": "rm -rf dist && parcel build index.html --experimental-scope-hoisting",
     "build:prod": "cross-env NODE_ENV=production parcel build index.html --no-source-maps"
   },
+  "browserslist": "> 1%, last 2 versions, not dead",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "glslify": "^7.1.1",
-    "regl": "^2.1.0"
+    "glslify": "^7.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
