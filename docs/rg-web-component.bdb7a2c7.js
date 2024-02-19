@@ -6,6 +6,7 @@ precision mediump float;
 
 uniform vec2 iResolution;
 uniform float iTime; // seconds
+uniform vec2 iMouse;
 
 #include "fragment.glsl"
 
@@ -104,10 +105,18 @@ float smoothstep3(float edge0, float edge1, float edge2, float x) {
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     vec2 uv = (fragCoord * 2. - iResolution.xy) / iResolution.y;
 
-    uv.xy*=rot2D(iTime);
+    //uv.xy*=rot2D(iTime);
+
+    vec2 mouse = (iMouse.xy - 0.5 * iResolution.xy) / (0.5 * iResolution.y);
+    vec2 dir = normalize(uv - mouse);
+    float d = distance(mouse, uv);
+    float p = 0.1 * (1.0 / (d * d));
+   // if(length(mouse)<.98){
+        uv=+mix(uv, mouse, p);
+   // }
     // Initialization
 
-    float fff = 1.4;
+    float fff = 1.5;
     vec3 ro = vec3(0, 0, -3);         // ray origin
     vec3 rd = normalize(vec3(uv*fff, 1)); // ray direction
     vec3 col = vec3(0);               // final pixel color
@@ -138,7 +147,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
 
     vec3 bgTint = vec3(1.);
     vec3 bg = vec3(0.);
-    float circR = 1.8;
+    float circR = 1.6;
     float edge0 = 0.45;
     float edgeInner = 0.51;
     float edgeOuter = 0.53;
@@ -162,6 +171,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     //fragColor = vec4(col, 1.);
     //fragColor = vec4(vec3(perimeter), 1.);
     fragColor = vec4(col, alpha);
+    //fragColor= vec4(vec3(d),1.);
 }
 `
 },{}],"F2K0":[function(require,module,exports) {
@@ -169,10 +179,11 @@ module.exports = `attribute vec2 a_position;
 
 uniform vec2 iResolution;
 uniform float iTime; // seconds
+uniform vec2 iMouse;
 void main() {
     gl_Position = vec4(a_position, 0, 1);
 }
 `
 },{}],"oVML":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.RgWebComponent=void 0;class e extends HTMLElement{constructor(){super(),this.attachShadow({mode:"open"})}connectedCallback(){console.log("connected");const e=this.getBoundingClientRect().width,t=this.getBoundingClientRect().height;this.shadowRoot.innerHTML=`\n            <style>\n                :host { display: block; width: 100%; height: 100%; }\n            </style>\n            <canvas id="rg-wgl-loader-canvas" width="${e}px" height="${t}px"></canvas>\n        `,this.mouse={x:0,y:0},this.startTime=Date.now(),this.setupWebGL(),this.setupMouseListeners()}setupWebGL(){const e=this.shadowRoot.getElementById("rg-wgl-loader-canvas"),t=e.getContext("webgl");if(!t)return void console.error("Unable to initialize WebGL. Your browser may not support it.");let r=require("./fragment-main.glsl");r=r.replace('#include "fragment.glsl"',require("./fragment.glsl"));const o=require("./vertex.glsl"),n=r,i=this.compileShader(t,t.VERTEX_SHADER,o),a=this.compileShader(t,t.FRAGMENT_SHADER,n);if(!i||!a)return void console.error("Shader compilation failed.");const s=this.createProgram(t,i,a);if(!s)return void console.error("Shader program linking failed.");const l=t.createBuffer();t.bindBuffer(t.ARRAY_BUFFER,l);const c=new Float32Array([-1,-1,-1,1,1,1,-1,-1,1,1,1,-1]);t.bufferData(t.ARRAY_BUFFER,c,t.STATIC_DRAW),t.useProgram(s);const d=t.getAttribLocation(s,"a_position");if(-1===d)return void console.error("Unable to get attribute location for a_position");t.enableVertexAttribArray(d),t.bindBuffer(t.ARRAY_BUFFER,l),t.vertexAttribPointer(d,2,t.FLOAT,!1,0,0);const h=t.getUniformLocation(s,"iResolution"),g=t.getUniformLocation(s,"iTime");if(null===h||null===g)return void console.error("Unable to get uniform location(s)");t.uniform2f(h,e.width,e.height);const u=()=>{t.clearColor(0,0,0,1),t.clear(t.COLOR_BUFFER_BIT),t.uniform1f(g,(Date.now()-this.startTime)/1e3),t.drawArrays(t.TRIANGLES,0,6)},m=()=>{u(),requestAnimationFrame(m)};m()}compileShader(e,t,r){const o=e.createShader(t);return e.shaderSource(o,r),e.compileShader(o),e.getShaderParameter(o,e.COMPILE_STATUS)?o:(console.error(`Error compiling shader: ${e.getShaderInfoLog(o)}`),e.deleteShader(o),null)}createProgram(e,t,r){const o=e.createProgram();return e.attachShader(o,t),e.attachShader(o,r),e.linkProgram(o),e.getProgramParameter(o,e.LINK_STATUS)?o:(console.error(`Unable to initialize the shader program: ${e.getProgramInfoLog(o)}`),null)}setupMouseListeners(){const e=this.shadowRoot.getElementById("rg-wgl-loader-canvas");e.addEventListener("mousemove",t=>{this.mouse.x=t.clientX/e.width*2-1,this.mouse.y=1-t.clientY/e.height*2})}}exports.RgWebComponent=e,customElements.define("rg-wgl-loader",e);
+"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.RgWebComponent=void 0;class e extends HTMLElement{constructor(){super(),this.attachShadow({mode:"open"})}connectedCallback(){console.log("connected");const e=this.getBoundingClientRect().width,t=this.getBoundingClientRect().height;this.shadowRoot.innerHTML=`\n            <style>\n                :host { display: block; width: 100%; height: 100%; }\n            </style>\n            <canvas id="rg-wgl-loader-canvas" width="${e}px" height="${t}px"></canvas>\n        `,this.mouse={x:0,y:0},this.startTime=Date.now(),this.setupWebGL(),this.setupMouseListeners()}setupWebGL(){const e=this.shadowRoot.getElementById("rg-wgl-loader-canvas"),t=e.getContext("webgl");if(!t)return void console.error("Unable to initialize WebGL. Your browser may not support it.");let o=require("./fragment-main.glsl");o=o.replace('#include "fragment.glsl"',require("./fragment.glsl"));const r=require("./vertex.glsl"),n=o,i=this.compileShader(t,t.VERTEX_SHADER,r),a=this.compileShader(t,t.FRAGMENT_SHADER,n);if(!i||!a)return void console.error("Shader compilation failed.");const s=this.createProgram(t,i,a);if(!s)return void console.error("Shader program linking failed.");const l=t.createBuffer();t.bindBuffer(t.ARRAY_BUFFER,l);const c=new Float32Array([-1,-1,-1,1,1,1,-1,-1,1,1,1,-1]);t.bufferData(t.ARRAY_BUFFER,c,t.STATIC_DRAW),t.useProgram(s);const g=t.getAttribLocation(s,"a_position");if(-1===g)return void console.error("Unable to get attribute location for a_position");t.enableVertexAttribArray(g),t.bindBuffer(t.ARRAY_BUFFER,l),t.vertexAttribPointer(g,2,t.FLOAT,!1,0,0);const h=t.getUniformLocation(s,"iResolution"),d=t.getUniformLocation(s,"iMouse"),u=t.getUniformLocation(s,"iTime");if(null===h||null===u)return void console.error("Unable to get uniform location(s)");t.uniform2f(h,e.width,e.height);const m=()=>{t.clearColor(0,0,0,1),t.clear(t.COLOR_BUFFER_BIT),t.uniform2f(d,this.mouse.x,this.mouse.y),t.uniform1f(u,(Date.now()-this.startTime)/1e3),t.drawArrays(t.TRIANGLES,0,6)},f=()=>{m(),requestAnimationFrame(f)};f()}compileShader(e,t,o){const r=e.createShader(t);return e.shaderSource(r,o),e.compileShader(r),e.getShaderParameter(r,e.COMPILE_STATUS)?r:(console.error(`Error compiling shader: ${e.getShaderInfoLog(r)}`),e.deleteShader(r),null)}createProgram(e,t,o){const r=e.createProgram();return e.attachShader(r,t),e.attachShader(r,o),e.linkProgram(r),e.getProgramParameter(r,e.LINK_STATUS)?r:(console.error(`Unable to initialize the shader program: ${e.getProgramInfoLog(r)}`),null)}setupMouseListeners(){const e=this.shadowRoot.getElementById("rg-wgl-loader-canvas"),t=e.getBoundingClientRect();e.addEventListener("mousemove",e=>{this.mouse.x=e.clientX-t.left,this.mouse.y=t.height-(e.clientY-t.top),console.log(this.mouse)})}}exports.RgWebComponent=e,customElements.define("rg-wgl-loader",e);
 },{"./fragment-main.glsl":"YgXc","./fragment.glsl":"yQI2","./vertex.glsl":"F2K0"}]},{},["oVML"], null)
