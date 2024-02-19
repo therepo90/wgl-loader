@@ -10,10 +10,7 @@ https://therepo90.github.io/wgl-loader/
 Be aware that your grandpa mobile browser probably won't see it.
 
 # Usage
-Include js
-```<script src="https://github.com/therepo90/wgl-loader/blob/main/rg-webz-component.[hash].js" ></script>```
-
-Or just download the file and
+Clone repo, build prod and use files from there:
 
 ```<script src="rg-web-component.js" ></script>```
 
