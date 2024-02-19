@@ -1,4 +1,4 @@
-export class WebComponent extends HTMLElement {
+export class RgWebComponent extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -139,3 +139,5 @@ export class WebComponent extends HTMLElement {
         });
     }
 }
+
+customElements.define('rg-wgl-loader', RgWebComponent);
