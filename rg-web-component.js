@@ -135,7 +135,7 @@ export class RgWebComponent extends HTMLElement {
         const canvas = this.shadowRoot.getElementById('rg-wgl-loader-canvas');
         const rect = canvas.getBoundingClientRect();
 
-        canvas.addEventListener('mousemove', (event) => {
+        document.addEventListener('mousemove', (event) => {
             this.mouse.x = event.clientX - rect.left;//((event.clientX - rect.left) / rect.width) * 2 - 1;
             this.mouse.y = rect.height-(event.clientY - rect.top);//-((event.clientY - rect.top) / rect.height) * 2 + 1;
             console.log(this.mouse);
