@@ -122,21 +122,23 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     vec3 bgTint = vec3(1.);
     vec3 bg = vec3(0.);
     float circR = 1.8;
-    float edge0 = 0.44;
-    float edgeInner = 0.48;
-    float edgeOuter = 0.55;
+    float edge0 = 0.45;
+    float edgeInner = 0.51;
+    float edgeOuter = 0.53;
 
     //uv+=sin(iTime)*0.1;
+    vec3 perimeterTint = vec3(0.506,0.871,0.996);
     float bgVal = 1.-smoothstep(edgeInner,edgeOuter, length(uv)/circR);
     float perimeter = smoothstep3(edge0, edgeInner, edgeOuter, length(uv)/circR);
+    perimeter*=abs(0.6+ sin(iTime*2.)*sin(iTime*2.)*1.3);
     //bgVal+=smoothstep(edgeInner,edgeOuter, length(uv)/circR) ;
     bg=bgVal*bgTint * (step(100.,t));//*abs(0.6+ sin(iTime)*sin(iTime)*1.3);
     //bg+=obwod*10.;
     //col+=bg;// * (step(100.,t)); // not hit - show bg
-    col+=perimeter ;
+    col+=perimeter * perimeterTint;
 
     float alpha = 1.;
-    alpha = (1.-smoothstep(edgeInner, edgeOuter, length(uv)/circR)); // transparent bg outside circle
+    alpha = (1.-smoothstep(edgeInner, edgeOuter, length(uv)/circR))* (1.-step(100.,t)) + perimeter; // transparent bg outside circle and inner
     //col += vec3(alpha) *.4;
     //col = vec3(alpha);
     //col = vec3(bgVal);
