@@ -1,3 +1,4 @@
+
 float sdSphere( vec3 p, float s ) // s -radius
 {
     return length(p)-s;
@@ -20,6 +21,15 @@ float smin(float a, float b, float k) {
     return mix(a, b, h) - k*h*(1.0-h);
 }
 
+float sminArr(float values[OBJ_CNT], float k) {
+    float result = values[0];
+
+    for (int i = 1; i < OBJ_CNT; i++) {
+        result = smin(result, values[i], k);
+    }
+
+    return result;
+}
 
 
 mat2 rot2D(float a) {
@@ -31,16 +41,16 @@ float map(vec3 p, out vec3 col1, out vec3 col2, out vec3 col3) {
 
 
     //vec3 sp1Pos = vec3(-3.0,.0,.0);
-    vec3 boxPos2 = vec3(-1.8,.0,.0);
+    vec3 boxPos2 = vec3(-1.6,.0,.0);
     vec3 q1 = p;
-    // q1.xy*=rot2D(iTime*2.);
+    q1.xy*=rot2D(iTime*2.);
     float sp1 = sdBox(q1-boxPos2,vec3(.75));
 
 
     vec3 cube1Tint = vec3(1.0,.0,.0);
     col1 = cube1Tint * max(0., 1.-sp1);
 
-    vec3 sp2Pos = vec3(sin(iTime*2.4)*2.1,.0,.0);
+    vec3 sp2Pos = vec3(sin(iTime*2.4)*1.7,.0,.0);
     //sp2Pos.xy*=rot2D(iTime);
     // vec3 q3 = q2.xy*=rot2D(-iTime*2.);
     // We are moving the origin, not the sphere. THe pixel thinks as if it was placed somewhere else.
@@ -50,23 +60,23 @@ float map(vec3 p, out vec3 col1, out vec3 col2, out vec3 col3) {
 
 
 
-    vec3 boxPos = vec3(1.8,0.0,0.);
+    vec3 boxPos = vec3(1.6,0.0,0.);
 
     vec3 q2 = p;
 
     //q2.xy*=rot2D(-iTime*2.);
 
-    //q2.yz*=rot2D(-iTime*2.);
+    q2.yz*=rot2D(-iTime*2.);
     float box=sdBox(q2-boxPos,vec3(.75));
 
     vec3 cube2Tint = vec3(0.0,0.0,1.0);
     col3 = cube2Tint * max(0.,1.-box); // dont go into negative colors
 
-    //float[OBJ_CNT] objs;
-    //objs[0]=sp1;
-    //objs[1]=sp2;
-    //objs[2]=box;
-    float result = smin(smin(sp1, sp2, 0.5), box, 0.5);
+    float objs[OBJ_CNT];
+    objs[0]=sp1;
+    objs[1]=sp2;
+    objs[2]=box;
+    float result = sminArr(objs, 0.5);
 
     return result;
 }
@@ -75,9 +85,10 @@ float map(vec3 p, out vec3 col1, out vec3 col2, out vec3 col3) {
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     vec2 uv = (fragCoord * 2. - iResolution.xy) / iResolution.y;
 
+    uv.xy*=rot2D(iTime);
     // Initialization
 
-    float fff = 1.9;
+    float fff = 1.4;
     vec3 ro = vec3(0, 0, -3);         // ray origin
     vec3 rd = normalize(vec3(uv*fff, 1)); // ray direction
     vec3 col = vec3(0);               // final pixel color
@@ -106,8 +117,19 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     //col=col1;
     col+=(col1 + col2 + col3)*t*.3;
 
-    col+=vec3(0.85) * step(100.,t); // not hit - show bg
+    vec3 bgTint = vec3(0.85);
+    vec3 bg = vec3(0.);
+    float circR = 1.8;
+    //uv+=sin(iTime)*0.1;
+    float bgVal = 1.-smoothstep(0.48,0.55,length(uv)/circR);
+    bgVal-=smoothstep(0.5,0.4,length(uv)/circR);
+    bg=bgVal*bgTint*abs(0.6+ sin(iTime)*sin(iTime)*1.3);
+    col+=bg;// * (step(100.,t)); // not hit - show bg
 
+    col+=vec3(1.)* (step(100.,t))*step(0.48,length(uv)/circR);
+    //col = bg;
+    //col*=palette(iTime);
+    //col*=sin(iTime);
     //col*=3.0;
     //float zz = min(0.,t);
     //col+=vec3(1.0)*step(0.,zz);
