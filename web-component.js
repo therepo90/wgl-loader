@@ -27,8 +27,11 @@ export class WebComponent extends HTMLElement {
             return;
         }
 
+        let fragmentContent = require('./fragment-main.glsl');
+        // replace #include "fragment.glsl" with the actual content of fragment.glsl
+        fragmentContent = fragmentContent.replace('#include "fragment.glsl"', require('./fragment.glsl'));
         const vertexShaderSource = require('./vertex.glsl');
-        const fragmentShaderSource = require('./fragment.glsl');
+        const fragmentShaderSource = fragmentContent;
 
         // Compile shaders
         const vertexShader = this.compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource);

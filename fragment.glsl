@@ -1,10 +1,3 @@
-#ifdef GL_ES
-precision mediump float;
-#endif
-
-uniform vec2 iResolution;
-uniform float iTime; // seconds
-
 float sdSphere( vec3 p, float s ) // s -radius
 {
     return length(p)-s;
@@ -127,13 +120,4 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     //col /= palette(t);
     // col = vec3(t * .2);
     fragColor = vec4(col, 1);
-}
-
-
-
-
-
-void main()
-{
-    mainImage(gl_FragColor, gl_FragCoord.xy);//, vUV * iResolution.xy);
 }

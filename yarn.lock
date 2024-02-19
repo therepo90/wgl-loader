@@ -3004,7 +3004,7 @@ glslify-deps@^1.2.5:
     map-limit "0.0.1"
     resolve "^1.0.0"
 
-glslify@^7.1.1:
+glslify@*:
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/glslify/-/glslify-7.1.1.tgz#454d9172b410cb49864029c86d5613947fefd30b"
   integrity sha512-bud98CJ6kGZcP9Yxcsi7Iz647wuDz3oN+IZsjCRi5X1PI7t/xPKeL0mOwXJjo+CRZMqvq0CkSJiywCcY7kVYog==
@@ -4293,6 +4293,14 @@ parcel-plugin-glsl@^0.1.0:
   resolved "https://registry.yarnpkg.com/parcel-plugin-glsl/-/parcel-plugin-glsl-0.1.0.tgz#c1ad4a35dcbe98c5f8cc3c31762a02fd8d2ed3db"
   integrity sha512-E4/p9oTdMuuvJAaEVPzRN2sV45R5Z87UOqkX+3ww0xGZiHIi6FQHZbQXSz07rcc6ETCNu+T4VQxIoTGkof11mg==
   dependencies:
+    parcel-bundler "*"
+
+parcel-plugin-glslify@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/parcel-plugin-glslify/-/parcel-plugin-glslify-0.1.0.tgz#00a05de0f568cfac2424525ddb8aa03ebc49a0ab"
+  integrity sha512-mcVxAHKRgYxq5jcRr9YwlRfH46SdddQ18syZ8SJOI7LXJX7JoYrHXpuOZJyJ2yUdLkW//T+nFaRMabg+cM46TA==
+  dependencies:
+    glslify "*"
     parcel-bundler "*"
 
 parcel-plugin-inline-source@^1.0.0:
