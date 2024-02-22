@@ -11,9 +11,9 @@
         }
 
         div.overlay-container {
-            position: fixed;
+            /*position: fixed;
             top: 0;
-            left: 0;
+            left: 0;*/
             width: 100vw;
             height: 100vh;
             z-index: 1;
@@ -31,7 +31,11 @@
             /*width: 400px;
             height: 400px;*/
         }
-        rg-wgl-loader {
+        .loader-container.heart{
+            width: 100vw;
+            height: 100vh;
+        }
+        rg-wgl-loader, rg-wgl-loader-heart {
             display: block;
             width: 100%;
             height: 100%;
@@ -53,6 +57,12 @@
 <div class="overlay-container">
     <div class="loader-container">
         <rg-wgl-loader></rg-wgl-loader>
+    </div>
+</div>
+<div class="overlay-container">
+
+    <div class="loader-container heart">
+        <rg-wgl-loader-heart></rg-wgl-loader-heart>
     </div>
 </div>
 </body>
