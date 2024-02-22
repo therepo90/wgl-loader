@@ -2,7 +2,7 @@
 
 This is a fancy webgl loader web component. Its only 9kb.
 
-![](https://github.com/therepo90/wgl-loader/blob/main/demo.gif)
+![](https://github.com/therepo90/wgl-loader/blob/main/github/demo.gif)
 
 # Demo:
 https://therepo90.github.io/wgl-loader/
